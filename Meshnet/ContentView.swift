@@ -1,9 +1,3 @@
-//
-//  ContentView.swift
-//  Meshnet
-//
-//  Created by Jeremiah Webb on 3/13/26.
-//
 import SwiftUI
 
 struct ContentView: View {
@@ -12,38 +6,60 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            // Header: Connection Status
+            // Header: Connection Status & Clear Button
             HStack {
-                Circle()
-                    .fill(multipeerManager.connectedPeers.isEmpty ? Color.red : Color.green)
-                    .frame(width: 10, height: 10)
-                Text("Connected Peers: \(multipeerManager.connectedPeers.count)")
-                    .font(.headline)
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(multipeerManager.connectedPeers.isEmpty ? Color.red : Color.green)
+                        .frame(width: 10, height: 10)
+                    
+                    Text("Peers: \(multipeerManager.connectedPeers.count)")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Spacer() // Pushes items to opposite sides
+                
+                Button(action: {
+                    multipeerManager.clearHistory()
+                }) {
+                    Text("Clear Chat")
+                        .font(.subheadline)
+                        .foregroundColor(.red)
+                }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top)
             
-            // Message List
-            List(multipeerManager.messages, id: \.self) { message in
-                Text(message)
+            Divider().padding(.vertical, 8)
+            
+            // Message List (with iOS 17+ auto-scroll)
+            ScrollViewReader { proxy in
+                List(multipeerManager.messages, id: \.self) { message in
+                    Text(message)
+                }
+                .onChange(of: multipeerManager.messages) { oldValue, newValue in
+                    // Scroll to the newest message whenever the array updates
+                    if let last = newValue.last {
+                        proxy.scrollTo(last)
+                    }
+                }
             }
             
-            // Message Input
+            // Input Area
             HStack {
-                TextField("Type a message...", text: $messageText)
+                TextField("Message...", text: $messageText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
                 Button(action: {
-                    guard !messageText.isEmpty else { return }
-                    multipeerManager.send(text: messageText)
+                    let trimmedText = messageText.trimmingCharacters(in: .whitespaces)
+                    guard !trimmedText.isEmpty else { return }
+                    multipeerManager.send(text: trimmedText)
                     messageText = ""
                 }) {
-                    Text("Send")
-                        .bold()
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(multipeerManager.connectedPeers.isEmpty ? Color.gray : Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                    Image(systemName: "paperplane.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(multipeerManager.connectedPeers.isEmpty ? .gray : .blue)
                 }
                 .disabled(multipeerManager.connectedPeers.isEmpty)
             }
