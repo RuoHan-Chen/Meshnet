@@ -172,9 +172,18 @@ extension MultipeerManager: MCSessionDelegate, MCNearbyServiceAdvertiserDelegate
         browser.invitePeer(peerID, to: session, withContext: nil, timeout: 10)
     }
     
+    
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        // We can hook into this later to show "Node Disconnected" messages
-    }
+            // When a device drops out of range, log it and force the browser to keep looking
+            print("Lost track of \(peerID.displayName)")
+            
+            // Optional: If you want to force a mini-refresh when someone drops
+            // to ensure the mesh heals around the missing node:
+            browser.stopBrowsingForPeers()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                browser.startBrowsingForPeers()
+            }
+        }
     
     // Required Stubs
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}

@@ -63,16 +63,28 @@ struct ContentView: View {
             .navigationTitle("MeshChat")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Clear") { manager.clearHistory() }
-                        .foregroundColor(.red)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingSettings.toggle() }) {
-                        Image(systemName: "gearshape.fill")
-                    }
-                }
-            }
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Clear") { manager.clearHistory() }
+                                    .foregroundColor(.red)
+                            }
+                            
+                            // Group the trailing buttons together
+                            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                                // 1. New Refresh Button
+                                Button(action: {
+                                    manager.restartSession()
+                                }) {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                
+                                // 2. Existing Settings Button
+                                Button(action: {
+                                    showingSettings.toggle()
+                                }) {
+                                    Image(systemName: "gearshape.fill")
+                                }
+                            }
+                        }
             .sheet(isPresented: $showingSettings) {
                 NavigationView {
                     Form {
