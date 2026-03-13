@@ -10,9 +10,22 @@
 		1224ADE72F63F3860092319F /* Meshnet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Meshnet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1224ADF62F63F5E90092319F /* Exceptions for "Meshnet" folder in "Meshnet" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1224ADE62F63F3850092319F /* Meshnet */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1224ADE92F63F3860092319F /* Meshnet */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1224ADF62F63F5E90092319F /* Exceptions for "Meshnet" folder in "Meshnet" target */,
+			);
 			path = Meshnet;
 			sourceTree = "<group>";
 		};
@@ -253,6 +266,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Meshnet/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This app needs the local network to discover and connect with nearby peers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +299,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Meshnet/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This app needs the local network to discover and connect with nearby peers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
