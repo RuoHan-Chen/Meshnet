@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your location is shared with the mesh network to help responders find you in an emergency.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_p2p-mesh._tcp</string>

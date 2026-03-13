@@ -8,22 +8,18 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Connection Header
                 HStack {
                     Circle()
                         .fill(manager.connectedPeers.isEmpty ? Color.red : Color.green)
                         .frame(width: 10, height: 10)
-                    Text("Direct Nodes: \(manager.connectedPeers.count)")
+                    Text("Mesh Nodes: \(manager.connectedPeers.count)")
                         .font(.caption)
-                        .foregroundColor(.gray)
                     Spacer()
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 8)
                 
-                Divider()
+                Divider().padding(.top, 8)
                 
-                // Chat Area
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: 12) {
@@ -33,16 +29,15 @@ struct ContentView: View {
                         }
                         .padding()
                     }
-                    .onChange(of: manager.messages) { oldValue, newValue in
+                    .onChange(of: manager.messages) { _, newValue in
                         if let last = newValue.last {
                             withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
                         }
                     }
                 }
                 
-                // Input Bar
                 HStack {
-                    TextField("Message network...", text: $messageText)
+                    TextField("Disaster Alert...", text: $messageText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
                     Button(action: {
@@ -51,102 +46,76 @@ struct ContentView: View {
                         manager.sendMessage(text: trimmed)
                         messageText = ""
                     }) {
-                        Image(systemName: "paperplane.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(manager.connectedPeers.isEmpty ? .gray : .blue)
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(manager.connectedPeers.isEmpty ? .gray : .orange)
                     }
                     .disabled(manager.connectedPeers.isEmpty)
                 }
                 .padding()
                 .background(Color(UIColor.systemGray6))
             }
-            .navigationTitle("MeshChat")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Disaster Mesh")
             .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Clear") { manager.clearHistory() }
-                                    .foregroundColor(.red)
-                            }
-                            
-                            // Group the trailing buttons together
-                            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                                // 1. New Refresh Button
-                                Button(action: {
-                                    manager.restartSession()
-                                }) {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                                
-                                // 2. Existing Settings Button
-                                Button(action: {
-                                    showingSettings.toggle()
-                                }) {
-                                    Image(systemName: "gearshape.fill")
-                                }
-                            }
-                        }
-            .sheet(isPresented: $showingSettings) {
-                NavigationView {
-                    Form {
-                        Section(header: Text("Profile"), footer: Text("Changing your name will briefly disconnect you from the mesh network.")) {
-                            TextField("Username", text: $manager.username)
-                        }
-                    }
-                    .navigationTitle("Settings")
-                    .toolbar {
-                        Button("Done") { showingSettings = false }
-                    }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Clear") { manager.clearHistory() }.foregroundColor(.red)
                 }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button(action: { manager.restartSession() }) { Image(systemName: "arrow.clockwise") }
+                    Button(action: { showingSettings.toggle() }) { Image(systemName: "gearshape.fill") }
+                }
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView(manager: manager, isPresented: $showingSettings)
             }
         }
     }
 }
 
-// Chat Bubble Subview
 struct MessageBubble: View {
     let message: LocalMessage
     
     var body: some View {
         HStack {
             if message.isMe { Spacer() }
-            
             VStack(alignment: message.isMe ? .trailing : .leading, spacing: 4) {
-                if !message.isMe {
-                    // --- NEW INDICATOR UI ---
-                    HStack(spacing: 4) {
-                        Text(message.senderName)
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                        
-                        Image(systemName: message.isRelayed ? "network" : "arrow.left.arrow.right")
-                            .font(.system(size: 9))
-                            .foregroundColor(message.isRelayed ? .orange : .green)
-                        
-                        Text(message.isRelayed ? "Relayed" : "Direct")
-                            .font(.system(size: 9))
-                            .foregroundColor(message.isRelayed ? .orange : .green)
+                HStack(spacing: 4) {
+                    Text(message.senderName).font(.caption2).bold()
+                    if message.isRelayed {
+                        Image(systemName: "network").font(.system(size: 9)).foregroundColor(.orange)
                     }
-                    // ------------------------
                 }
                 
                 Text(message.content)
                     .padding(10)
                     .background(message.isMe ? Color.blue : Color(UIColor.systemGray5))
                     .foregroundColor(message.isMe ? .white : .primary)
-                    .cornerRadius(16)
+                    .cornerRadius(12)
                 
-                if message.isMe {
-                    HStack(spacing: 2) {
-                        Text(message.status.rawValue.capitalized)
-                            .font(.system(size: 10))
-                        Image(systemName: message.status == .delivered ? "checkmark.circle.fill" : "checkmark.circle")
-                            .font(.system(size: 10))
-                    }
-                    .foregroundColor(message.status == .delivered ? .green : .gray)
+                // NEW: Coordinates Display
+                if let lat = message.latitude, let lon = message.longitude {
+                    Text(String(format: "Loc: %.4f, %.4f", lat, lon))
+                        .font(.system(size: 8, design: .monospaced))
+                        .foregroundColor(.gray)
                 }
             }
-            
             if !message.isMe { Spacer() }
+        }
+    }
+}
+
+struct SettingsView: View {
+    @ObservedObject var manager: MultipeerManager
+    @Binding var isPresented: Bool
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Identify Yourself")) {
+                    TextField("Username", text: $manager.username)
+                }
+            }
+            .navigationTitle("Settings")
+            .toolbar { Button("Done") { isPresented = false } }
         }
     }
 }
