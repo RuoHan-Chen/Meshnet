@@ -9,7 +9,7 @@ struct MeshPayload: Codable {
     let type: PayloadType
     var targetMessageId: UUID?
     
-    // NEW: GPS Coordinates for Disaster Relief Map
+    // GPS Coordinates for the mesh
     var latitude: Double?
     var longitude: Double?
     
@@ -33,8 +33,6 @@ struct LocalMessage: Identifiable, Codable, Equatable {
     let isMe: Bool
     var status: DeliveryStatus
     var isRelayed: Bool = false
-    
-    // Store coordinates locally for the UI
     var latitude: Double?
     var longitude: Double?
 }
